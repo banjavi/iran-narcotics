@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style>
+.ostan {
+	opacity: 1;
+}
+.ostan:hover {
+	opacity: .5;
+}
+
+
+
+</style>
+<body>
+    <script src="http://d3js.org/d3.v4.min.js"></script>
+    <script src="http://d3js.org/topojson.v2.js"></script>
+		<script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
+    <script src="https://d3js.org/d3-queue.v3.min.js"></script>
+    <script>
+
+		var width = 2000,
+		    height = 1000;
+
+		var color = d3.scaleThreshold()
+		.domain([0, 20000, 40000, 60000, 80000, 100000, 120000, 140000])
+		.range(d3.schemeOranges[8]);
+
+		// bostock schematic axis + tooltip - cite
+		var x = d3.scaleLinear()
+		.domain([0, 140000])
+		    .rangeRound([600, 860]);
+		var svg = d3.select("body").append("svg")
+		    .attr("width", width)
+		    .attr("height", height);
+
+		d3.queue()
+		.defer(d3.json, "iran_topo.json")
+
+				.defer(d3.csv, "narcotics.csv")
+		    .await(ready);
+
+
+		// user mercator instead for iran projection
+		var projection = d3.geoMercator()
+		.center([53, 35])
+	  .scale(2000)
+	  .translate([width / 2, height / 2]);
+
+		var path = d3.geoPath().projection(projection);
+
+		function ready(error, json, data) {
+			if (error) throw error;
+			console.log(json);
+			var totalById = {};
+	    var nameById = {};
+
+	    data.forEach(function(d) {
+	     totalById[d.id] = +d.total;
+	     nameById[d.id] = d.ostan;
+	   });
+
+
+
+
+
+			svg.selectAll('.ostan')
+		    .data(topojson.feature(json, json.objects.ir).features)
+		  .enter().append('path')
+				.attr("fill", function(d) {console.log("name: " + d.properties.name + " | id: " + totalById[d.properties.adm1_code]); return color(totalById[d.properties.adm1_code]);})
+		    .attr('stroke', 'gray')
+		    .attr('stroke-width', '0.5')
+		    .attr('id', function (d) { return 'state_' + d.properties.adm1_code})
+		    .attr('class', 'ostan')
+		    .attr('d', path)
+				.on("mouseover", function (d) {
+				    var tip = "<h3>" + d.properties.name + "</h3>";
+				    tooltip.html(tip)
+				        .style("left", (d3.event.pageX) + "px")
+				        .style("top", (d3.event.pageY) + "px");
+				    tooltip.transition()
+				        .duration(500)
+				        .style("opacity", .7);
+
+				})
+				.on("mouseout", function (d) {
+				    tooltip.transition()
+				        .duration(500)
+				        .style("opacity", 0);
+				});
+				}
+    </script>
+</body>
