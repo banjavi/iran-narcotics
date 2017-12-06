@@ -1,4 +1,9 @@
 <!DOCTYPE html>
+<!--
+File Name: index.html
+Author: Bijan Anjavi
+Description: An interactive choropleth of Iran depicting the amount of narcotic disclosure (kg) per Ostan.
+-->
 <meta charset="utf-8">
 
 <body>
@@ -8,17 +13,11 @@
 		<script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
     <script src="https://d3js.org/d3-queue.v3.min.js"></script>
 
-
-
-
-
-
-
 		<div id="container">
 
-			<div id="map-container-one" class="map-container">
+			<div id="container-one">
 				<h1>Iran's Narcotic Distribution </h1>
-				<p class="subhead">The narcotic disclosure amongst the 31 Ostans of Iran.</p>
+				<p class="subhead">An interactive choropleth of Iran depicting the amount of narcotic disclosure (kg) per Ostan.</p>
 				<div id="map-nav">
 					<div class="button" id="button-population">
 					Population
@@ -32,26 +31,26 @@
 
 				</div>
 
-				<div id="map-legend"></div>
+				<div id="legend"></div>
 
-				<div id="map-distribution-popup">
-					<div id="popup-title">[Ostan] Narcotic Distribution</div>
-					<!--<div class="map-popup-row" id="popup-total-pop">
-						<div class="map-popup-type">Total population</div>
-						<div class="map-popup-value">TBA</div>
+				<div id="sidebar">
+					<div id="sidebar-title">[Ostan] Narcotic Distribution</div>
+					<!--<div class="map-sidebar-row" id="sidebar-row-population">
+						<div class="map-sidebar-type">Total population</div>
+						<div class="map-sidebar-value">TBA</div>
 					</div> -->
-					<div class="map-popup-row" id="popup-total-narcotics">
-						<div class="map-popup-type">Total Narcotic Disclosure</div>
-						<div class="map-popup-value">7,459</div>
+					<div class="sidebar-row" id="sidebar-row-narcotics">
+						<div class="sidebar-type">Total Narcotic Disclosure</div>
+						<div class="sidebar-value">7,459</div>
 					</div>
 
-					<div id="map-distribution-chart"></div>
+					<div id="chart"></div>
 
 
 				</div>
 			</div>
 
-			<div id="map-container-two">
+			<div id="container-two">
 
 			</div>
 
