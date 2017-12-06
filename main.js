@@ -3,7 +3,7 @@
 var width = 2000,
 		height = 1000;
 var narcoticRanges = [ 'heroin', 'morphine', 'opium', 'hashish', 'other'],
-			narcoticChartH = 150,
+			narcoticChartH = 250,
 			narcoticChartW = 350,
 			narcoticBarW = 0,
 			narcoticChart = undefined,
@@ -11,7 +11,9 @@ var narcoticRanges = [ 'heroin', 'morphine', 'opium', 'hashish', 'other'],
 			narcoticAxisX = undefined,
 			narcoticAxisY = undefined,
 			narcoticAxisScale = undefined,
-			narcoticChartP = 20;
+			narcoticChartP = 20
+			mapType = 'button-narcotics';
+
 var color = d3.scaleThreshold()
 .domain([0, 20000, 40000, 60000, 80000, 100000, 120000, 140000])
 .range(d3.schemeOranges[8]);
@@ -135,15 +137,15 @@ function generateNarcoticsChart(){
 	function setNarcoticScales(){
 		narcoticBarW = (narcoticChartW-narcoticChartP -narcoticChartP-narcoticChartP) / narcoticRanges.length
 		narcoticScale = d3.scaleLinear()
-		    .domain([0, 50])
+		    .domain([0, 100])
 		    .range([0,narcoticChartH - 2*narcoticChartP]);
 		narcoticAxisScale = d3.scaleLinear()
-		    .domain([50,0])
+		    .domain([100,0])
 		    .range([0,narcoticChartH - 2*narcoticChartP]);
 
 
 		narcoticAxisY = d3.axisLeft(narcoticAxisScale)
-		    .ticks(5)
+		    .ticks(10)
 		    .tickFormat(function(d){
 			return d + '%';
 		})
@@ -162,6 +164,57 @@ function generateNarcoticsChart(){
 
 
 
+
+
+	function populateChart(id){
+
+				var chartLabel = '';
+				var chartLabelValue = '';
+			if( mapType == 'button-narcotics'){
+				chartLabel = 'Total Narcotic Disclosure (kg)';
+				chartLabelValue = totalById[id];
+			} else if( mapType == 'button-population'){
+				chartLabel = 'Total Population';
+				//chartLabelValue = obj['census']['nativePopPct'] + '%'
+			} else if( mapType == 'button-income'){
+				chartLabel = 'Total Household Income'
+				//chartLabelValue = '$' + addCommas(obj['census']['medianHouseholdIncome'])
+			}
+
+			var chartTitle = nameById[id] + " Narcotic Distribution";
+
+			d3.select(".map-popup-type").text(chartLabel);
+			d3.select(".map-popup-value").text(chartLabelValue);
+
+			d3.select("#popup-title").text(chartTitle);
+
+			var narcoticTotal = totalById[id];
+			var narcoticDistributionPercentages = [heroinById[id]/narcoticTotal*100, morphineById[id]/narcoticTotal*100, opiumById[id]/narcoticTotal*100, hashishById[id]/narcoticTotal*100, otherById[id]/narcoticTotal*100];
+			console.log("HEY " + narcoticDistributionPercentages);
+			var rect = narcoticChart.selectAll('.narcotic-bar')
+				.data(narcoticRanges)
+				rect.enter()
+				.append('rect')
+						.attr('class', 'narcotic-bar')
+						.attr('width', narcoticBarW-1)
+						.attr('x', function(d,i){
+							return narcoticChartP +  i * narcoticBarW
+						})
+
+
+				rect.transition()
+					.duration(500).attr('height', function(d,i){
+						//console.log("HEIGHT | i:" + i + "| array: " + narcoticDistributionPercentages[d] + " scale:" + narcoticScale(narcoticDistributionPercentages[i]) );
+
+						 	return narcoticScale(narcoticDistributionPercentages[i]);
+						})
+						.attr('y', function(d,i){
+							//console.log("Y | i:" + i + "| array: " + narcoticDistributionPercentages[i] + " scale:" + narcoticScale(narcoticDistributionPercentages[i]) );
+
+							return narcoticChartH - narcoticChartP - narcoticScale(narcoticDistributionPercentages[i]);
+						})
+
+	}
 
 
 
@@ -214,16 +267,18 @@ var projection = d3.geoMercator()
 
 var path = d3.geoPath().projection(projection);
 
+var nameById = {};
+var totalById = {};
+var heroinById = {};
+var morphineById = {};
+var opiumById = {};
+var hashishById = {};
+var otherById = {};
+var x;
 function ready(error, json, data) {
 	if (error) throw error;
 	console.log(json);
-	var nameById = {};
-	var totalById = {};
-	var heroinById = {};
-	var morphineById = {};
-	var opiumById = {};
-	var hashishById = {};
-	var otherById = {};
+
 
 	data.forEach(function(d) {
 	 nameById[d.id] = d.ostan;
@@ -257,6 +312,8 @@ function ready(error, json, data) {
 				tooltip.transition()
 						.duration(500)
 						.style("opacity", .7);
+
+				populateChart(d.properties.adm1_code);
 
 
 
