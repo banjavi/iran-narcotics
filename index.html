@@ -1,146 +1,71 @@
 <!DOCTYPE html>
 <meta charset="utf-8">
-<style>
-.ostan {
-	opacity: 1;
-}
-.ostan:hover {
-	opacity: .5;
-}
 
-.tooltip {
-    position: absolute;
-    max-width: 400px;
-    height: auto;
-    padding: 5px;
-    background-color: white;
-    -webkit-border-radius: 5px;
-    -moz-border-radius: 5px;
-    border-radius: 5px;
-    -webkit-box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.4);
-    -moz-box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.4);
-    box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.4);
-    pointer-events: none;
-    font-family: sans-serif;
-    font-size: 12px;
-}
-
-
-</style>
 <body>
+		<link rel="stylesheet" type="text/css" href="main.css">
     <script src="http://d3js.org/d3.v4.min.js"></script>
     <script src="http://d3js.org/topojson.v2.js"></script>
 		<script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
     <script src="https://d3js.org/d3-queue.v3.min.js"></script>
-    <script>
-
-		var width = 2000,
-		    height = 1000;
-
-		var color = d3.scaleThreshold()
-		.domain([0, 20000, 40000, 60000, 80000, 100000, 120000, 140000])
-		.range(d3.schemeOranges[8]);
-
-		// bostock schematic axis + tooltip - cite
-		var x = d3.scaleLinear()
-		.domain([0, 140000])
-		    .rangeRound([600, 860]);
-		var svg = d3.select("body").append("svg")
-		    .attr("width", width)
-		    .attr("height", height);
-
-				var tooltip = d3.select("body").append("div")
-				            .attr("class", "tooltip")
-				            .style("opacity", 0)
-				            .style("width", 600);
-
-				var g = svg.append("g")
-				    .attr("class", "key")
-				    .attr("transform", "translate(0,40)");
-
-				g.selectAll("rect")
-				  .data(color.range().map(function(d) {
-				      d = color.invertExtent(d);
-				      if (d[0] == null) d[0] = x.domain()[0];
-				      if (d[1] == null) d[1] = x.domain()[1];
-				      return d;
-				    }))
-				  .enter().append("rect")
-				    .attr("height", 8)
-				    .attr("x", function(d) { return x(d[0]); })
-				    .attr("width", function(d) { return x(d[1]) - x(d[0]); })
-				    .attr("fill", function(d) { return color(d[0]); });
-
-				g.append("text")
-				    .attr("class", "caption")
-				    .attr("x", x.range()[0])
-				    .attr("y", -6)
-				    .attr("fill", "#000")
-				    .attr("text-anchor", "start")
-				    .attr("font-weight", "bold")
-				    .text("Narcotic Disclosure (Thousands of kilograms)");
-
-				g.call(d3.axisBottom(x)
-				    .tickSize(13)
-				    .tickFormat(function(x, i) { return i ? x : x  + "K"; })
-						.tickFormat(function(x, i) { return x / 1000; })
-				    .tickValues(color.domain()))
-				  .select(".domain")
-				    .remove();
-		d3.queue()
-		.defer(d3.json, "iran_topo.json")
-
-				.defer(d3.csv, "narcotics.csv")
-		    .await(ready);
-
-
-		// user mercator instead for iran projection
-		var projection = d3.geoMercator()
-		.center([53, 35])
-	  .scale(2000)
-	  .translate([width / 2, height / 2]);
-
-		var path = d3.geoPath().projection(projection);
-
-		function ready(error, json, data) {
-			if (error) throw error;
-			console.log(json);
-			var totalById = {};
-	    var nameById = {};
-
-	    data.forEach(function(d) {
-	     totalById[d.id] = +d.total;
-	     nameById[d.id] = d.ostan;
-	   });
 
 
 
 
 
-			svg.selectAll('.ostan')
-		    .data(topojson.feature(json, json.objects.ir).features)
-		  .enter().append('path')
-				.attr("fill", function(d) {console.log("name: " + d.properties.name + " | id: " + totalById[d.properties.adm1_code]); return color(totalById[d.properties.adm1_code]);})
-		    .attr('stroke', 'gray')
-		    .attr('stroke-width', '0.5')
-		    .attr('id', function (d) { return 'state_' + d.properties.adm1_code})
-		    .attr('class', 'ostan')
-		    .attr('d', path)
-				.on("mouseover", function (d) {
-				    var tip = "<h3>" + d.properties.name + "</h3>";
-				    tooltip.html(tip)
-				        .style("left", (d3.event.pageX) + "px")
-				        .style("top", (d3.event.pageY) + "px");
-				    tooltip.transition()
-				        .duration(500)
-				        .style("opacity", .7);
 
-				})
-				.on("mouseout", function (d) {
-				    tooltip.transition()
-				        .duration(500)
-				        .style("opacity", 0);
-				});
-				}
-    </script>
+
+		<div id="container">
+
+			<div id="map-container-one" class="map-container">
+				<h1>Iran's Narcotic Distribution </h1>
+				<p class="subhead">The narcotic disclosure amongst the 31 Ostans of Iran.</p>
+				<div id="map-nav">
+					<div class="button" id="button-population">
+					Population
+					</div>
+					<div class="button" id="button-narcotics">
+					Narcotic Disclosure
+					</div>
+					<div class="button" id="button-income">
+					Income
+					</div>
+
+				</div>
+
+				<div id="map-legend"></div>
+
+				<div id="map-distribution-popup">
+					<div id="popup-title">[Ostan] Narcotic Distribution</div>
+					<div class="map-popup-row" id="popup-total-pop">
+						<div class="map-popup-type">Total population</div>
+						<div class="map-popup-value">7,459</div>
+					</div>
+					<div class="map-popup-row" id="popup-total-narcotics">
+						<div class="map-popup-type">Total narcotics</div>
+						<div class="map-popup-value">7,459</div>
+					</div>
+
+					<div id="map-distribution-chart"></div>
+
+
+				</div>
+			</div>
+
+			<div id="map-container-two">
+
+			</div>
+
+
+
+		</div>
+
+
+
+
+
+
+
+
+
+		<script src="main.js"></script>
 </body>
