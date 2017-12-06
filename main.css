@@ -1,0 +1,86 @@
+.ostan {
+	opacity: 1;
+  stroke-width: 1px;
+}
+.ostan:hover {
+	opacity: .9;
+	stroke-width: 2px;
+}
+
+.tooltip {
+    position: absolute;
+    max-width: 400px;
+    height: auto;
+    padding: 5px;
+    background-color: white;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 5px;
+    -webkit-box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.4);
+    -moz-box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.4);
+    box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.4);
+    pointer-events: none;
+    font-family: sans-serif;
+    font-size: 12px;
+}
+
+.button {
+	display: inline-block;
+	 padding: 8px 10px;
+	 margin-right: -5px;
+	 color: #505050;
+	 font-size: 14px;
+	 font-family: Helvetica,Arial,sans-serif;
+	 font-weight: 200;
+	 line-height: 1em;
+	 cursor: pointer;
+	 text-shadow: 1px 1px 1px rgba(255,255,255,0.2);
+	 -webkit-background-clip: text;
+	 -moz-background-clip: text;
+	 background-clip: text;
+	 border: 1px solid #b4b4b4;
+	 background: -webkit-gradient(linear,left top,left bottom,color-stop(0.05,#fff),color-stop(1,#dcdcdc));
+}
+
+.button:hover {
+	opacity: .75;
+	stroke-width: 3px;
+}
+
+
+#map-distribution-popup {
+    width: 350px;
+    border: 1px solid #ccc;
+    margin-top: 20px;
+    padding-top: 10px;
+    overflow: auto;
+}
+
+#popup-title {
+    float: left: width: 280px;
+    padding: 0 10px;
+    font-size: 110%;
+    font-family: 'Guardian-Compact-Web-Black-Latin', Georgia, sans;
+}
+
+
+.map-popup-row {
+    padding: 0 10px;
+    width: 280px;
+    float: left;
+}
+
+.map-popup-type {
+    font-size: 12px;
+    font-family: Arial;
+    font-weight: bold;
+    float: left;
+}
+
+.map-popup-value {
+    font-size: 12px;
+    font-family: 'Guardian-Text-Egyp-Web-Reg-Latin', Arial;
+    font-weight: normal;
+    float: left;
+    margin-left: 5px;
+}
