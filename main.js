@@ -16,7 +16,7 @@ var legendWidth = 800,
 	legendHeight = 100,
 	legend = undefined;
 
-var narcoticRanges = [ 'heroin', 'morphine', 'opium', 'hashish', 'other'],
+var narcoticRanges = ['heroin', 'morphine', 'opium', 'hashish', 'other'],
 	narcoticChartHeight = 250,
 	narcoticChartWidth = 350,
 	narcoticBarWidth = 0,
@@ -26,27 +26,29 @@ var narcoticRanges = [ 'heroin', 'morphine', 'opium', 'hashish', 'other'],
 	narcoticAxisY = undefined,
 	narcoticAxisScale = undefined,
 	narcoticChartPadding = 20
-	mapType = 'button-narcotics';
+	mapType = 'narcotic';
 
 var colorPopulation = d3.scaleThreshold()
-	//.domain([0, 20000, 40000, 60000, 80000, 100000, 120000, 140000])
+	.domain([0, 2000000, 4000000, 6000000, 8000000, 10000000, 12000000, 14000000])
 	.range(d3.schemePurples[8]);
 var colorNarcoticDisclosure = d3.scaleThreshold()
 	.domain([0, 20000, 40000, 60000, 80000, 100000, 120000, 140000])
 	.range(d3.schemeOranges[8]);
-var colorIncome = d3.scaleThreshold()
-	//.domain([0, 20000, 40000, 60000, 80000, 100000, 120000, 140000])
+var colorUnemployment = d3.scaleThreshold()
+	.domain([0, 2.5, 5, 7.5, 10, 12.5, 15, 17.5])
 	.range(d3.schemeGreens[8]);
 
-var x = d3.scaleLinear()
-	.domain([0, 140000])
-	.rangeRound([10, 350]);
+var xScalePopulation = d3.scaleLinear().domain([0, 14000000]).rangeRound([10, 350]);
+var xScaleNarcotics = d3.scaleLinear().domain([0, 140000]).rangeRound([10, 350]);
+var xScaleUnemployment = d3.scaleLinear().domain([0, 17.5]).rangeRound([10, 350]);
 
 var projection = undefined,
 	path = undefined;
 
 var nameById = {},
-	totalById = {},
+	populationById = {},
+ 	unemploymentById = {},
+	narcoticById = {},
 	heroinById = {},
 	morphineById = {},
 	opiumById = {},
@@ -73,7 +75,7 @@ initializeIranMap();
 
 /************ Begin Functions ************/
 
-/* Description: initialize svg, tooltip, projection and path + load data files. */
+/* Description: initialize svg, tooltip,buttons,  projection and path + load data files. */
 function initializeIranMap(){
 	iranMap = d3.select("#container-two").append("svg")
 		.attr("id", "iran-map")
@@ -99,6 +101,15 @@ function initializeIranMap(){
 		.scale(2000)
 		.translate([iranMapWidth / 3, iranMapHeight / 3]);
 	path = d3.geoPath().projection(projection);
+
+
+	// buttons
+	/* Having some issues - just change mapType variable and refresh for now
+	d3.select("#button-population").on("click", function (d) {mapType = "population";drawLegend();drawIranMap();});
+	d3.select("#button-narcotic").on("click", function (d) {mapType = "narcotic";drawLegend();drawIranMap();});
+	d3.select("#button-unemployment").on("click", function (d) {mapType = "unemployment";drawLegend();drawIranMap();});
+	*/
+
 }
 
 /* Description: Draw the paths for each of the Ostans making up the country of Iran, adding js interactivity along the way. */
@@ -109,21 +120,31 @@ function drawIranMap(error, json, data) {
 	// populate dictionaries
 	data.forEach(function(d) {
 		nameById[d.id] = d.ostan;
-		totalById[d.id] = +d.total;
+		populationById[d.id] = d.population;
+		unemploymentById[d.id] = d.unemployment;
+		narcoticById[d.id] = +d.narcotic;
 		heroinById[d.id] = d.heroin;
 		morphineById[d.id] = d.morphine;
 		opiumById[d.id] = d.opium;
 		hashishById[d.id] = d.hashish;
 		otherById[d.id] = d.other;
 		// might not need above after this
-		narcoticArray = {name: d.ostan, total: d.total, heroin: d.heroin, morphine: d.morphine, opium: d.opium, hahish: d.hashish, other: d.other};
+		narcoticArray = {name: d.ostan, total: d.narcotic, heroin: d.heroin, morphine: d.morphine, opium: d.opium, hahish: d.hashish, other: d.other};
 	});
 
 	// draw ostans
 	iranMap.selectAll('.ostan')
 		.data(topojson.feature(json, json.objects.ir).features)
 		.enter().append('path')
-			.attr("fill", function(d) {console.log("name: " + d.properties.name + " | id: " + totalById[d.properties.adm1_code]); return colorNarcoticDisclosure(totalById[d.properties.adm1_code]);})
+			.attr("fill", function(d) {
+				console.log("name: " + d.properties.name + " | id: " + narcoticById[d.properties.adm1_code]);
+				if(mapType == "population")
+					return colorPopulation(populationById[d.properties.adm1_code]);
+				if(mapType == "narcotic")
+					return colorNarcoticDisclosure(narcoticById[d.properties.adm1_code]);
+				if(mapType == "unemployment")
+					return colorUnemployment(unemploymentById[d.properties.adm1_code]);
+			})
 			.attr('stroke', 'gray')
 			.attr('stroke-width', '0.5')
 			.attr('id', function (d) { return d.properties.adm1_code})
@@ -222,17 +243,17 @@ function setNarcoticScales(){
 function updateChart(id){
 	var chartLabel;
 	var chartLabelValue;
-	if( mapType == 'button-narcotics'){
+	if( mapType == 'narcotic'){
 		chartLabel = 'Total Narcotic Disclosure (kg)';
-		chartLabelValue = totalById[id];
+		chartLabelValue = narcoticById[id];
 	}
-	else if( mapType == 'button-population'){
-		chartLabel = 'Total Population';
-		//chartLabelValue = obj['census']['nativePopPct'] + '%'
+	else if( mapType == 'population'){
+		chartLabel = 'Total Narcotic Disclosure (kg)';
+		chartLabelValue = narcoticById[id];
 	}
-	else if( mapType == 'button-income'){
-		chartLabel = 'Total Household Income'
-		//chartLabelValue = '$' + addCommas(obj['census']['medianHouseholdIncome'])
+	else if( mapType == 'unemployment'){
+		chartLabel = 'Total Narcotic Disclosure (kg)';
+		chartLabelValue = narcoticById[id];
 	}
 	var chartTitle = nameById[id] + " Narcotic Distribution";
 
@@ -240,7 +261,7 @@ function updateChart(id){
 	d3.select(".sidebar-value").text(chartLabelValue);
 	d3.select("#sidebar-title").text(chartTitle);
 
-	var narcoticTotal = totalById[id];
+	var narcoticTotal = narcoticById[id];
 	var narcoticDistributionPercentages = [heroinById[id]/narcoticTotal*100, morphineById[id]/narcoticTotal*100, opiumById[id]/narcoticTotal*100, hashishById[id]/narcoticTotal*100, otherById[id]/narcoticTotal*100];
 	//console.log("HEY " + narcoticDistributionPercentages);
 	var rect = narcoticChart.selectAll('.narcotic-bar')
@@ -264,40 +285,59 @@ function updateChart(id){
 }
 
 /* Description: draws legend for iranMap */
-
 function drawLegend(){
+
+	var colorScale, legendText, xScale;
+	if(mapType == "population"){
+		colorScale = colorPopulation;
+		legendText = "Population (# of People)";
+		xScale = xScalePopulation;
+	}
+	if(mapType == "narcotic"){
+		colorScale = colorNarcoticDisclosure;
+		legendText = "Narcotic Disclosure (Thousands of kilograms)";
+		xScale = xScaleNarcotics;
+
+	}
+
+	if(mapType == "unemployment"){
+		colorScale = colorUnemployment;
+		legendText = "Unemployment Rate";
+		xScale = xScaleUnemployment;
+	}
+
 	var svgLegend = d3.select("#legend").append("svg")
-			.attr("id", "legend")
+			.attr("id", "svg-legend")
 			.attr("width", 800)
 			.attr("height", 100);
 			var g = svgLegend.append("g")
 					.attr("class", "key")
 					.attr("transform", "translate(0,40)");
 			g.selectAll("rect")
-				.data(colorNarcoticDisclosure.range().map(function(d) {
-						d = colorNarcoticDisclosure.invertExtent(d);
-						if (d[0] == null) d[0] = x.domain()[0];
-						if (d[1] == null) d[1] = x.domain()[1];
+				.data(colorScale.range().map(function(d) {
+						d = colorScale.invertExtent(d);
+						if (d[0] == null) d[0] = xScale.domain()[0];
+						if (d[1] == null) d[1] = xScale.domain()[1];
 						return d;
 					}))
 				.enter().append("rect")
 					.attr("height", 12)
-					.attr("x", function(d) { return x(d[0]); })
-					.attr("width", function(d) { return x(d[1]) - x(d[0]); })
-					.attr("fill", function(d) { return colorNarcoticDisclosure(d[0]); });
+					.attr("x", function(d) { return xScale(d[0]); })
+					.attr("width", function(d) { return xScale(d[1]) - xScale(d[0]); })
+					.attr("fill", function(d) { return colorScale(d[0]); });
 			g.append("text")
 					.attr("class", "caption")
-					.attr("x", x.range()[0])
+					.attr("x", xScale.range()[0])
 					.attr("y", -6)
 					.attr("fill", "#000")
 					.attr("text-anchor", "start")
 					.attr("font-weight", "bold")
-					.text("Narcotic Disclosure (Thousands of kilograms)");
-			g.call(d3.axisBottom(x)
+					.text(legendText);
+			g.call(d3.axisBottom(xScale)
 					.tickSize(13)
 					.tickFormat(function(x, i) { return i ? x : x  + "K"; })
-					.tickFormat(function(x, i) { return x / 1000; })
-					.tickValues(colorNarcoticDisclosure.domain()))
+					.tickFormat(function(x, i) { return x; })
+					.tickValues(colorScale.domain()))
 				.select(".domain")
 					.remove();
 }
