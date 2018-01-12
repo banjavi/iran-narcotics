@@ -86,6 +86,12 @@ function initializeIranMap(){
 		.style("opacity", 0)
 		.style("width", tooltipWidth);
 
+		iranMap.append("svg:image")
+                //.attr("href", "https://c.tile.openstreetmap.org/4/10/6.png")
+                .attr("x", "-85")
+                .attr("y", "-5")
+                .attr("width", "1200")
+                .attr("height", "800");
 	// wait till topoJSON and CSV are loaded completely prior to drawing the svg map
 	d3.queue()
 		.defer(d3.json, "iran_topo.json")
