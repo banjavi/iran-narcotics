@@ -61,6 +61,11 @@ var nameById = {},
 
 /************ Begin Main Calls ************/
 // draw the legend for the iranMap
+
+var svgLegend = d3.select("#legend").append("svg")
+		.attr("id", "svg-legend")
+		.attr("width", 800)
+		.attr("height", 100);
 drawLegend();
 
 // initialize bar chart in sidebar
@@ -104,18 +109,17 @@ function initializeIranMap(){
 
 
 	// buttons
-	/* Having some issues - just change mapType variable and refresh for now
-	d3.select("#button-population").on("click", function (d) {mapType = "population";drawLegend();drawIranMap();});
-	d3.select("#button-narcotic").on("click", function (d) {mapType = "narcotic";drawLegend();drawIranMap();});
-	d3.select("#button-unemployment").on("click", function (d) {mapType = "unemployment";drawLegend();drawIranMap();});
-	*/
+	d3.select("#button-population").on("click", function (d) {mapType = "population";drawLegend();updateIranMap();});
+	d3.select("#button-narcotic").on("click", function (d) {mapType = "narcotic";drawLegend(); updateIranMap();});
+	d3.select("#button-unemployment").on("click", function (d) {mapType = "unemployment";drawLegend(); updateIranMap();});
+
 
 }
 
 /* Description: Draw the paths for each of the Ostans making up the country of Iran, adding js interactivity along the way. */
 function drawIranMap(error, json, data) {
-	if (error) throw error;
-	console.log(json);
+	//if (error) throw error;
+	//console.log(json);
 
 	// populate dictionaries
 	data.forEach(function(d) {
@@ -138,6 +142,8 @@ function drawIranMap(error, json, data) {
 		.enter().append('path')
 			.attr("fill", function(d) {
 				console.log("name: " + d.properties.name + " | id: " + narcoticById[d.properties.adm1_code]);
+				console.log("mapType: " + mapType);
+
 				if(mapType == "population")
 					return colorPopulation(populationById[d.properties.adm1_code]);
 				if(mapType == "narcotic")
@@ -168,6 +174,28 @@ function drawIranMap(error, json, data) {
 					.duration(500)
 					.style("opacity", 0);
 				});
+}
+
+
+function updateIranMap(){
+	var ostans = iranMap.selectAll(".ostan");
+	console.log("mapType: " + mapType);
+
+
+	ostans.attr("fill", function d(){
+		if(mapType == "population")
+			return colorPopulation(populationById[d3.select(this).attr("id")]);
+		if(mapType == "narcotic")
+			return colorNarcoticDisclosure(narcoticById[d3.select(this).attr("id")]);
+		if(mapType == "unemployment")
+			return colorUnemployment(unemploymentById[d3.select(this).attr("id")]);
+	});
+
+
+
+
+
+
 }
 
 
@@ -255,7 +283,7 @@ function updateChart(id){
 		chartLabel = 'Total Narcotic Disclosure (kg)';
 		chartLabelValue = narcoticById[id];
 	}
-	var chartTitle = nameById[id] + " Narcotic Distribution";
+	var chartTitle = nameById[id];
 
 	d3.select(".sidebar-type").text(chartLabel);
 	d3.select(".sidebar-value").text(chartLabelValue);
@@ -285,7 +313,7 @@ function updateChart(id){
 }
 
 /* Description: draws legend for iranMap */
-function drawLegend(){
+function drawLegend(flag){
 
 	var colorScale, legendText, xScale;
 	if(mapType == "population"){
@@ -306,10 +334,8 @@ function drawLegend(){
 		xScale = xScaleUnemployment;
 	}
 
-	var svgLegend = d3.select("#legend").append("svg")
-			.attr("id", "svg-legend")
-			.attr("width", 800)
-			.attr("height", 100);
+	d3.select("#svg-legend").selectAll("g").remove();
+
 			var g = svgLegend.append("g")
 					.attr("class", "key")
 					.attr("transform", "translate(0,40)");
