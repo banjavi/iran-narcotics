@@ -241,7 +241,7 @@ function initializeNarcoticsChart(){
 		.enter()
 		.append('rect')
 			.attr('class', 'narcotic-bar')
-			.attr('width', narcoticBarWidth-1)
+			.attr('width', narcoticBarWidth-2)
 			.attr('y', narcoticChartHeight - narcoticChartPadding)
 			.attr('x', function(d,i){return narcoticChartPadding +  i * narcoticBarWidth});
 }
