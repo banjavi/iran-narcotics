@@ -94,7 +94,7 @@ function initializeIranMap(){
 	// wait till topoJSON and CSV are loaded completely prior to drawing the svg map
 	d3.queue()
 		.defer(d3.json, "iran_topo.json")
-		.defer(d3.csv, "narcotics.csv")
+		.defer(d3.csv, "1392_narcotics.csv")
 		.await(drawIranMap); // call to draw the svg
 
 	//c.tile.openstreetmap 4/10/6 - 1st prokection - find corners find the 4 corners
@@ -104,7 +104,7 @@ function initializeIranMap(){
 	projection = d3.geoMercator()
 		.center([53, 35])
 		.scale(2000)
-		.translate([iranMapWidth / 3, iranMapHeight / 3]);
+		.translate([iranMapWidth / 2, iranMapHeight / 2.8]);
 	path = d3.geoPath().projection(projection);
 
 
@@ -132,8 +132,6 @@ function drawIranMap(error, json, data) {
 		opiumById[d.id] = d.opium;
 		hashishById[d.id] = d.hashish;
 		otherById[d.id] = d.other;
-		// might not need above after this
-		narcoticArray = {name: d.ostan, total: d.narcotic, heroin: d.heroin, morphine: d.morphine, opium: d.opium, hahish: d.hashish, other: d.other};
 	});
 
 	// draw ostans
