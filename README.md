@@ -15,8 +15,9 @@ The goal of this project is to analyze narcotics data from Iran using the "data-
 
 The foundational paper, "A Survey of Colormaps in Visualization," offers a comprehensive analysis of colormaps, emphasizing 1D colormaps over bivariate types. The primary objectives of the paper were to review current colormap generation techniques, classify these techniques, and establish a reference for colormap choices. This project adopts the first goal, emphasizing the creation of a choropleth by considering the dataset at the onset and molding the visualization features around this data.
 
+In the process of this project, a significant transformation was undertaken. The original dataset, represented in the Iranian Statistical Yearbook, was primarily in a table format. While tables are informative, they often do not provide an intuitive grasp of patterns, trends, or anomalies. Recognizing this, the old table visual from the narcotics yearbook was upgraded into a more dynamic, interactive visualization. This modern representation not only offers a more immediate understanding but also allows users to explore the data in depth, focusing on specific regions, time frames, or narcotic types. 
+
 ![Old Table Visualization](assets/narc_table.jpg)
-![Old Chart Visualization](assets/chart.jpg)
 
 ## Implementation Details
 
