@@ -9,7 +9,7 @@ The goal of this project is to analyze narcotics data from Iran using the "data-
 
 ### Interactive Visualization Demo
 
-![Visualization Video](assets/video.mp4)
+![Visualization GIF](assets/vis_gif.gif)
 
 ## Extended Abstract
 
